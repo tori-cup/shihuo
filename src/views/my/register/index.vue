@@ -43,7 +43,7 @@ export default {
             this.username = values.用户名;
             this.password = values.密码;
 
-            this.$http.post('http://127.0.0.1:8888/user/register', {
+            this.$http.post('http://127.0.0.1:8888/register', {
                 imgurl: this.imgurl,
                 username: this.username,
                 password: this.password,

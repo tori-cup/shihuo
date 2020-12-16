@@ -1,6 +1,6 @@
 <template>
-    <div id="cinema">
-        <div class="cinema">
+    <div id="classify">
+        <div class="classify">
             <ul v-infinite-scroll="getuserlist" infinite-scroll-disabled="loading" infinite-scroll-distance="40">
                 <li v-for="item in userlist" :key="item._id">
                     <img id="img" :src="item.imgurl" />
@@ -101,17 +101,17 @@ export default {
     height: 40px;
 }
 
-#content #cinema {
+#content #classify {
     flex: 1;
     overflow: auto;
 }
 
-#cinema ul {
+#classify ul {
     margin: 0 12px;
     overflow: hidden;
 }
 
-#cinema ul li {
+#classify ul li {
     height: 40px;
     margin-top: 2px;
     display: flex;
@@ -120,22 +120,22 @@ export default {
     padding-bottom: 10px;
 }
 
-#cinema .pic_show {
+#classify .pic_show {
     width: 64px;
     height: 90px;
 }
 
-#cinema .pic_show img {
+#classify .pic_show img {
     width: 100%;
 }
 
-#cinema .info_list {
+#classify .info_list {
     margin-left: 10px;
     flex: 1;
     position: relative;
 }
 
-#cinema .info_list h2 {
+#classify .info_list h2 {
     font-size: 17px;
     line-height: 24px;
     width: 150px;
@@ -144,7 +144,7 @@ export default {
     text-overflow: ellipsis;
 }
 
-#cinema .info_list p {
+#classify .info_list p {
     font-size: 13px;
     color: #666;
     line-height: 22px;
@@ -154,21 +154,21 @@ export default {
     text-overflow: ellipsis;
 }
 
-#cinema .info_list .grade {
+#classify .info_list .grade {
     font-weight: 700;
     color: #faaf00;
     font-size: 15px;
 }
 
-#cinema .info_list img {
+#classify .info_list img {
     width: 50px;
     position: absolute;
     right: 10px;
     top: 5px;
 }
 
-#cinema .btn_mall,
-#cinema .btn_pre {
+#classify .btn_mall,
+#classify .btn_pre {
     width: 47px;
     height: 27px;
     line-height: 28px;
@@ -180,7 +180,7 @@ export default {
     cursor: pointer;
 }
 
-#cinema .btn_pre {
+#classify .btn_pre {
     background-color: #3c9fe6;
 }
 </style>

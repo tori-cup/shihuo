@@ -5,7 +5,9 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    hasLogin: '未登录'
+    hasLogin: '未登录',
+    footerFlag: true
+    // searchflag: false
   },
   mutations: {
     login(state) {
@@ -13,7 +15,20 @@ export default new Vuex.Store({
     },
     edit(state) {
       state.hasLogin = '未登录'
+    },
+    footerFlagOut(state) {
+      state.footerFlag = false
+    },
+    footerFlagGo(state) {
+      state.footerFlag = true
     }
+    // searchflag(state) {
+    //   if (state.searchflag === false) {
+    //     state.searchflag = true
+    //   } else if (state.searchflag === true) {
+    //     state.searchflag = false
+    //   }
+    // }
   },
   actions: {},
   modules: {}

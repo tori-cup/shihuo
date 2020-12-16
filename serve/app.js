@@ -1,3 +1,5 @@
+const { SSL_OP_NO_TLSv1_1 } = require('constants')
+
 const express = require('express')
 const app = new express()
 const mongoose = require('mongoose')
@@ -73,16 +75,18 @@ app.post('/upload', upload.single('avatar'), function(req, res, next) {
 })
 
 //注册
-app.post('/user/register', async (req, res) => {
+app.post('/register', async (req, res) => {
   const resultss = await User.find({ username: req.body.username })
   const user = new User(req.body)
-
+  console.log('开始')
   if (resultss.length > 0) {
+    console.log('失败')
     res.json({
       code: 20001,
       msg: '用户名重复请重试'
     })
   } else {
+    console.log('成功')
     var results = await user.save()
     res.json({
       code: 20000,
@@ -91,57 +95,37 @@ app.post('/user/register', async (req, res) => {
   }
 })
 
-// 登录
-// app.post('/user/login', function(req, res) {
-//   console.log(req.body.username)
-//   const result = User.find({ username: req.body.username })
-//   // mongoose.connect('mongodb://localhost:27017/user').then(mon => {
-//   //   const users = new User(req.body)
-//   //   console.log(users)
-//   // })
-//   let token = createToken(req.body)
-//   res.json({
-//     code: 20000,
-//     msg: '登陆成功',
-//     token
-//   })
-// })
 //登陆
-
-app.post('/user/login', async (req, res) => {
+app.post('/login', async (req, res) => {
   const result = await User.find()
   const username1 = req.body.username
   const password1 = req.body.password
+  var flag = false
+  console.log(result[28])
   result.forEach(item => {
+    console.log(item.username === username1)
     if (item.username === username1 && item.password === password1) {
+      let token = createToken(req.body)
       res.json({
         code: 20000,
         msg: '登陆成功',
-        result
-      })
-    } else {
-      res.json({
-        code: 20001,
-        msg: '登陆失败，请检查账号'
+        result,
+        token
       })
     }
+    const flag = true
   })
+  if (!flag) {
+    res.json({
+      code: 20001,
+      msg: '登陆失败，请检查账号'
+    })
+  }
 })
-// 移动端登录接口（简易接口）
-// app.post('/user/login', async (req, res) => {
-//   console.log(req.body)
-//   // const user = new User(req.body) //获取comment页面提交的评论信息
-//   // const result = await user.save() // 保存
-//   res.json({
-//     code: 20000,
-//     msg: '登陆成功',
-//     token: 'asdasdqweq113213asasa'
-//   })
-// })
 
 // const { roles, name, avatar, introduction } = data
 // 退出登录
-app.post('/user/logout', function(req, res) {
+app.post('/logout', function(req, res) {
   res.json({ code: 20000, message: 'success' })
 })
 // 获取用户列表
@@ -198,7 +182,7 @@ app.get('/lunbo', (req, res) => {
   })
 })
 // // 登录
-// app.post('/user/login', (req, res) => {
+// app.post('/login', (req, res) => {
 //   console.log(req.body)
 //   mongoose.connect('mongodb://localhost:27017/movie').then(mon => {
 //     Movie.findByIdAndUpdate(req.body.id, req.body).then(result => {
@@ -227,4 +211,144 @@ app.get('/lunbo', (req, res) => {
 //   })
 // })
 
+// element-admin 管理后台
+// 登录接口
+app.post('/user/login', function(req, res) {
+  // req.session.token='加密算法生成随机token'
+  // const data={"code":20000,"data":{"roles":["editor"],"token":req.session.token,"introduction":"I am a super administrator","avatar":"https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif","name":"Super Admin"}}
+  const data = {
+    code: 20000,
+    data: {
+      token: 'asasasasas',
+      orangiseid: 'wwwwwwww',
+      introduction: 'I am a super administrator',
+      avatar:
+        'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif',
+      name: 'Super111 Admin'
+    }
+  }
+  res.json(data)
+})
+
+// 拉取用户信息
+app.get('/user/info', function(req, res) {
+  const data = {
+    code: 20000,
+    data: {
+      roles: ['editor'],
+      introduction: 'I am a super administrator',
+      avatar:
+        'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif',
+      name: 'Super111 Admin'
+    }
+  }
+  res.json(data)
+})
+
+//注销
+app.post('/user/logout', function(req, res) {
+  res.json({ code: 20000, message: 'success' })
+})
+// 添加城市
+app.post('/create/city', (req, res) => {
+  const city = new City(req.body)
+  city.save().then(mon => {
+    console.log(mon)
+  })
+  res.json({
+    msg: '添加成功'
+  })
+})
+
+// 读取城市列表 因为返回的是promise对象，所以才能够使用async和await
+app.get('/citys', async (req, res) => {
+  const result = await City.find()
+  if (result.length > 0) {
+    res.json({
+      code: 20000,
+      message: '数据获取成功',
+      citys: result
+    })
+  } else {
+    res.json({
+      code: 20001,
+      message: '暂无数据'
+    })
+  }
+})
+// 上传图片
+app.post('/comment/uploadpic', upload.single('avatar'), function(
+  req,
+  res,
+  next
+) {
+  //上传文件
+  if (req.file) {
+    res.json({
+      code: 20000,
+      path: req.file.path //文件的完整路径，包括目录/文件名
+    })
+  }
+})
+// 添加评论
+app.post('/create/comment', async (req, res) => {
+  const comment = new CityComment(req.body)
+  const result = await comment.save()
+  if (result) {
+    res.json({
+      code: 20000,
+      msg: '添加成功'
+    })
+  }
+})
+
+// 读取评论列表
+app.get('/comments', async (req, res) => {
+  const result = await CityComment.find()
+  if (result.length > 0) {
+    res.json({
+      code: 20000,
+      message: '数据获取成功',
+      comments: result
+    })
+  } else {
+    res.json({
+      code: 20001,
+      message: '暂无数据'
+    })
+  }
+})
+// 编辑评论列表
+app.post('/updateCity', async (req, res) => {
+  console.log(req.body.name)
+  const data = await City.findByIdAndUpdate(req.body.id, {
+    name: req.body.name,
+    region: req.body.region,
+    date1: req.body.date1,
+    date2: req.body.date2,
+    delivery: req.body.delivery,
+    type: req.body.type,
+    resource: req.body.resource,
+    desc: req.body.desc,
+    showflag: true
+  })
+})
+// 删除评论列表
+app.get('/deleteCity', async (req, res) => {
+  const index = req.query.id
+  console.log(index)
+  const result = await City.findByIdAndRemove(index)
+  console.log(result)
+  if (result) {
+    res.json({
+      code: 20000,
+      message: '数据删除成功'
+    })
+  } else {
+    res.json({
+      code: 20001,
+      message: '失败'
+    })
+  }
+})
 app.listen(8888, '127.0.0.1')

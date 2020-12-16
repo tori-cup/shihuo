@@ -71,20 +71,19 @@ export default {
             document.cookie = `username=${this.username}`;
             // 点击登录 切换登录状态为'已登录'
             this.$store.commit('login');
-            this.$http.post('http://127.0.0.1:8888/user/login', {
+            this.$http.post('http://127.0.0.1:8888/login', {
                 username: this.username,
                 password: this.password,
             }).then(res => {
+                console.log(res)
                 if (res.data.code === 20000) {
                     Toast.success(res.data.msg);
-                    this.$router.push('/my');
+                    this.$router.push('/my/info');
                     setToken(res.data.token);
                     this.hasLogin = getToken() || "";
-                } else if (res.data.code === 20001) {
-                    console.log(1)
+                } else {
                     Toast.fail(res.data.msg);
                 }
-
             })
         },
         // 改变登录方式

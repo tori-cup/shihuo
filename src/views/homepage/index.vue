@@ -1,6 +1,6 @@
 <template>
-    <div id="say">
-        say
+    <div id="homepage" :class="addclassname">
+        <router-view/>
     </div>
 </template>
 
@@ -8,14 +8,21 @@
 export default {
     data() {
         return {
+            addclassname: '',
         };
     },
     computed: {},
     watch: {},
     methods: {
     },
-    created() { },
-    mounted() { },
+    created() {
+
+    },
+
+    mounted() {
+        // 进入首页显示main内容，否则只能点击后显示
+        this.$router.push('/homepage/main');
+    },
     beforeCreate() { },
     beforeMount() { },
     beforeUpdate() { },

@@ -13,42 +13,43 @@ VueRouter.prototype.push = function push(location) {
 const routes = [
   {
     path: '/',
-    name: 'movie',
-    component: () => import('../views/movie/index.vue')
+    name: 'homepage',
+    component: () => import('../views/homepage/index.vue')
   },
   {
-    path: '/movie',
-    name: 'Movie',
-    redirect: '/movie/main',
-    component: () => import('../views/movie/index.vue'),
+    path: '/homepage',
+    name: 'Homepage',
+    redirect: '/homepage/main',
+    component: () => import('../views/homepage/index.vue'),
     children: [
       {
         path: 'main',
-        component: () => import('../views/movie/main/index.vue')
+        component: () => import('../views/homepage/main/index.vue')
       },
       {
-        path: 'round',
-        component: () => import('../views/movie/round/index.vue')
+        path: 'search',
+        component: () => import('../views/homepage/main/index.vue')
       },
       {
-        path: 'say',
-        component: () => import('../views/movie/say/index.vue')
-      },
-      {
-        path: 'people',
-        component: () => import('../views/movie/people/index.vue')
+        path: 'detail',
+        component: () => import('../views/homepage/detail/index.vue')
       }
     ]
   },
   {
-    path: '/cinema',
-    name: 'cinema',
-    component: () => import('../views/cinema/index.vue')
+    path: '/classify',
+    name: 'classify',
+    component: () => import('../views/classify/index.vue')
   },
   {
-    path: '/ask',
-    name: 'ask',
-    component: () => import('../views/ask/index.vue')
+    path: '/find',
+    name: 'find',
+    component: () => import('../views/find/index.vue')
+  },
+  {
+    path: '/cart',
+    name: 'cart',
+    component: () => import('../views/cart/index.vue')
   },
   {
     path: '/my',
