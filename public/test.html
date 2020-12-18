@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=
+    , initial-scale=1.0"
+    />
+    <title>Document</title>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  </head>
+  <style>
+    .title {
+      width: 500px;
+      height: 40px;
+      border: 2px solid #666666;
+      border-radius: 5px;
+      position: relative;
+      margin: auto;
+    }
+
+    .title input {
+      height: 35px;
+      float: left;
+      width: 400px;
+      border-radius: 5px;
+      outline: none;
+      border: 1px solid transparent;
+      font-size: 18px;
+    }
+
+    .title .title-right {
+      width: 95px;
+      height: 42px;
+      position: absolute;
+      top: -1px;
+      right: -1px;
+      background-color: #4e6ef2;
+      cursor: pointer;
+      border-radius: 0 5px 5px 0;
+      color: white;
+      text-align: center;
+      line-height: 44px;
+      font-size: 18px;
+    }
+
+    ul {
+      width: 366px;
+      height: 300px;
+      position: absolute;
+      top: 22px;
+      border: 1px solid #cecece;
+      left: -1.5px;
+      border-top: 1px solid transparent;
+    }
+
+    ul li {
+      list-style: none;
+    }
+  </style>
+
+  <body>
+    
+
+    <script>
+      var vm = new Vue({
+        el: '#app',
+        data: {
+            videoFlag: false,
+            //是否显示进度条
+            videoUploadPercent: "",
+            //进度条的进度，
+            isShowUploadVideo: false,
+            //显示上传按钮
+            videoForm: {
+                showVideoPath: ''
+            }
+        },
+        methods: {
+            //上传前回调
+            beforeUploadVideo(file) {
+                var fileSize = file.size / 1024 / 1024 < 50;
+                if (['video/mp4', 'video/ogg', 'video/flv', 'video/avi', 'video/wmv', 'video/rmvb', 'video/mov'].indexOf(file.type) == -1) {
+                    layer.msg("请上传正确的视频格式");
+                    return false;
+                }
+                if (!fileSize) {
+                    layer.msg("视频大小不能超过50MB");
+                    return false;
+                }
+                this.isShowUploadVideo = false;
+            },
+            //进度条
+            uploadVideoProcess(event, file, fileList) {
+                this.videoFlag = true;
+                this.videoUploadPercent = file.percentage.toFixed(0) * 1;
+            },
+            //上传成功回调
+            handleVideoSuccess(res, file) {
+                this.isShowUploadVideo = true;
+                this.videoFlag = false;
+                this.videoUploadPercent = 0;
+                
+                //前台上传地址
+                //if (file.status == 'success' ) {
+                //    this.videoForm.showVideoPath = file.url;
+                //} else {
+                //     layer.msg("上传失败，请重新上传");
+                //}
+
+                //后台上传地址
+                if (res.Code == 0) {
+                    this.videoForm.showVideoPath = res.Data;
+                } else {
+                    layer.msg(res.Message);
+                }
+            }
+        }
+    })
+    </script>
+  </body>
+</html>

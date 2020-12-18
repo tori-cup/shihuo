@@ -1,37 +1,47 @@
 <template>
   <div class="">
     <div class="divwrap" v-if="show">
-      <v-distpicker type="mobile" @province="onChangeProvince1" @city="onChangeCity" @area="onChangeArea"></v-distpicker>
+      <v-distpicker
+        type="mobile"
+        @province="onChangeProvince1"
+        @city="onChangeCity"
+        @area="onChangeArea"
+      ></v-distpicker>
     </div>
     <!--遮罩层-->
     <div class="blacks" v-if="show" @click="countermand"></div>
     <!--触发选择-->
     <div @click="choose" id="choose">
       <span>所在地区</span>
-      <span v-if="city === ''">请选择</span>
-      <span v-else>{{ city }}</span>
+      <span v-if="city === ''">
+        <p v-if="showcityflag">请选择</p>
+        <p v-else>{{ showcity }}</p>
+      </span>
+      <span v-else>
+        {{ city }}
+      </span>
     </div>
   </div>
 </template>
 
 <script>
-import VDistpicker from "v-distpicker";
+import VDistpicker from 'v-distpicker';
 
 export default {
   components: { VDistpicker },
-  name: "particular",
+  name: 'particular',
   data() {
     return {
-      lxr: "",
-      lxdh: "",
+      lxr: '',
+      lxdh: '',
       show: false,
       //省市区
-      province: "",
-      city: "",
-      area: "",
+      province: '',
+      city: '',
+      area: '',
     };
   },
-  props: ["ips"],
+  props: ['ips', 'showcityflag', 'showcity'],
   methods: {
     //取消选择地区
     countermand: function() {
@@ -43,7 +53,7 @@ export default {
     },
     onChangeProvince1: function(a) {
       this.province = a.value;
-      if (a.value == "台湾省") {
+      if (a.value == '台湾省') {
         this.show = false;
       }
     },
@@ -55,7 +65,7 @@ export default {
       this.show = false;
       this.city = this.province + this.city + this.area;
       // 子传父
-      this.$emit('city', this.city)
+      this.$emit('city', this.city);
     },
   },
 };
@@ -73,12 +83,6 @@ export default {
   background: rgba(0, 0, 0, 0.45);
 }
 
-
-
-
-
-
-
 /*省市区三级联动*/
 
 .divwrap {
@@ -90,29 +94,16 @@ export default {
   z-index: 99;
 }
 
-
-
-
-
-
-
 /*外部*/
 
-.divwrap>.distpicker-address-wrapper {
+.divwrap > .distpicker-address-wrapper {
   color: #0d0d0d;
   height: 100%;
 }
 
-
-
-
-
-
-
-
 /*头部*/
 
-.divwrap>>>.address-header {
+.divwrap >>> .address-header {
   background: #fff;
   color: #fff;
   width: 100%;
@@ -125,23 +116,11 @@ export default {
   margin: 0;
 }
 
-
-
-
-
-
-
-
-
-
-
-
 /*头部内容*/
-
 
 /* 头部li 省市区 */
 
-.divwrap>>>.address-header ul li {
+.divwrap >>> .address-header ul li {
   /* flex-grow: 1; */
   width: 100px;
   color: #52697f;
@@ -149,52 +128,30 @@ export default {
   padding: 0;
 }
 
-
-
-
-
-
-
-
-
-
-
-
 /*选择过省市区的头部*/
 
-.divwrap>>>.address-header .active {
+.divwrap >>> .address-header .active {
   width: 36px;
   border-bottom: #52697f solid 3px;
 }
 
-
-
-
-
-
-
-
-
 /*内容部分*/
 
-.divwrap>>>.address-container {
+.divwrap >>> .address-container {
   overflow: scroll;
   height: 100%;
 }
 
-
 /*点过的地区内容*/
 
-.divwrap>>>.address-container .active {
+.divwrap >>> .address-container .active {
   color: red;
 }
-
-
 
 /* choose */
 
 #choose {
   display: flex;
-  justify-content: space-around
+  justify-content: space-around;
 }
 </style>

@@ -12,6 +12,23 @@ import MintUI from 'mint-ui'
 import 'mint-ui/lib/style.css'
 Vue.use(MintUI)
 
+// import VideoPlayer from 'vue-video-player'
+// Vue.use(VideoPlayer)
+// import 'videojs-contrib-hls';
+// import 'video.js/dist/video-js.css'
+// import $ from 'jquery'
+
+// import ElementUI from 'element-ui';
+// import 'element-ui/lib/theme-chalk/index.css';
+// Vue.use(ElementUI);
+
+import { List } from 'vant';
+Vue.use(List);
+
+// import Video from 'video.js'
+// import 'video.js/dist/video-js.css'
+// Vue.prototype.$video = Video
+
 import axios from 'axios'
 Vue.prototype.$http = axios
 

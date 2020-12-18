@@ -2,31 +2,42 @@
   <div class="shopCart">
     <div class="cartList">
       <!-- 购物车有商品 显示 -->
-      <ul v-if="goods.length > 0">
+      <ul v-if="goods">
         <!-- 循环 -->
         <li v-for="item in goods" :key="item.id">
+          <!-- 单选框 item.isChecked判断是否选中 -->
           <van-checkbox
             :value="item.id"
             v-model="item.isChecked"
             checked-color="#15C481"
             @click="chooseChange(item.id, item)"
+            ref="check"
           ></van-checkbox>
+          <!-- 商品列表 -->
           <div class="shopdetail">
             <div class="detailimg">
-              <img :src="item.thumb" />
+              <img :src="item.shop.img" />
             </div>
             <div class="detailtext">
               <div class="shoptitle van-multi-ellipsis--l2">
-                {{ item.title }}
+                <p>{{ item.shop.title }}</p>
+                <p>{{ item.shop.intro }}</p>
               </div>
               <div class="shoppricenum">
                 <p class="shopprice">
-                  ¥{{ item.price
+                  ¥{{ item.shop.price
                   }}{{ item.lvd > 0 ? '+' + item.lvd + 'LVD' : '' }}
                 </p>
                 <div class="shopnum">
-                  <van-stepper v-model="item.num" @change="onChange(item)" />
+                  <van-stepper
+                    v-model="item.num"
+                    @plus="onChangePlus(item)"
+                    @minus="onChangeMinus(item)"
+                    min="1"
+                    max="99"
+                  />
                 </div>
+                <p ref="singleTotal">{{ item.num * item.shop.price }}</p>
               </div>
             </div>
           </div>
@@ -37,10 +48,11 @@
         <van-icon name="shopping-cart-o" />
         <p class="p1">你的购物车空空如也~~</p>
         <p class="p2">快去采购吧!</p>
+        <button class="gotohome" @click="gotohome">去逛逛</button>
       </div>
     </div>
     <!-- 有商品 显示计算总价 -->
-    <div class="cartfotter" v-if="goods.length > 0">
+    <div class="cartfotter" v-if="goods">
       <van-submit-bar button-text="去结算" @submit="onSubmit">
         <van-checkbox
           v-model="allchecked"
@@ -51,7 +63,8 @@
         <div class="buyprice">
           <p class="p1">合计</p>
           <p class="p2">
-            ¥{{ totalprice }}{{ totallvd > 0 ? '+' + totallvd + 'LVD' : '' }}
+            <!-- {{ totallvd > 0 ? '+' + totallvd + 'LVD' : '' }} -->
+            ¥{{ totalprice }}
           </p>
         </div>
       </van-submit-bar>
@@ -71,111 +84,147 @@ export default {
   },
   data() {
     return {
-      goods: [
-        {
-          id: 1,
-          title: 'Zoneid 2019 新款羊羔绒蓝白拼接立领夹克男 9.9成新',
-          price: 980,
-          lvd: 12,
-          num: 1,
-          thumb:
-            'https://img.yzcdn.cn/public_files/2017/10/24/2f9a36046449dafb8608e99990b3c205.jpeg',
-        },
-        {
-          id: 2,
-          title: '青春女装复古时尚保暖拼接翻领夹克',
-          price: 1200,
-          lvd: 0,
-          num: 2,
-          thumb:
-            'https://img.yzcdn.cn/public_files/2017/10/24/f6aabd6ac5521195e01e8e89ee9fc63f.jpeg',
-        },
-        {
-          id: 3,
-          title: '成熟男装新款西装立体拼接立领夹克和正装',
-          price: 1000,
-          lvd: 8,
-          num: 1,
-          thumb:
-            'https://img.yzcdn.cn/public_files/2017/10/24/320454216bbe9e25c7651e1fa51b31fd.jpeg',
-        },
-      ],
+      goods: [],
       allchecked: false,
       selectedData: [],
       // 总价
       totalprice: 0,
-      totallvd: 0,
+      // totallvd: 0,
     };
   },
   created: function() {
-    this.count();
+    window.onbeforeunload = function($event) {
+      //判断是关闭还是刷新
+      if (
+        ($event.clientX > document.body.clientWidth && $event.clientY < 0) ||
+        $event.altKey
+      ) {
+        //关闭时执行
+      } else {
+        //刷新时执行
+        this.count();
+      }
+    };
+    // 刚进入页面 所有商品不选中
+    if (JSON.parse(localStorage.getItem('shop'))) {
+      this.goods = JSON.parse(localStorage.getItem('shop'));
+      this.goods.forEach((item, index) => {
+        this.goods[index].isChecked = false;
+      });
+      localStorage.setItem('shop', JSON.stringify(this.goods));
+      this.goods = JSON.parse(localStorage.getItem('shop'));
+    } else {
+      this.goods = false;
+    }
   },
   computed: {},
   methods: {
     // 单选的change事件
-    chooseChange(i, item) {
-      Toast(i);
-      if (this.selectedData.indexOf(i) > -1) {
-        console.log(i);
-        var arrs = this.selectedData.filter(function(item) {
-          return item != i;
-        });
-        this.selectedData = arrs;
-        item.isChecked = false;
-        // this.remove(this.selectedData, i);
-        this.count();
-        console.log(this.selectedData);
-      } else {
-        this.selectedData.push(i);
-        item.isChecked = true;
-        this.count();
-      }
-      if (this.selectedData.length < this.goods.length) {
-        this.allchecked = false;
-      } else {
-        this.allchecked = true;
-      }
-      this.count();
-      console.log(this.selectedData);
-    },
-    // 商品数量
-    onChange(item) {
-      Toast(item.num);
-      this.count();
-      console.log(this.goods);
-    },
-    // 计算价格
-    count: function() {
-      var totalPrice = 0; //临时总价
-      var totalLvd = 0; //临时lvd
-      this.goods.forEach(function(val) {
-        if (val.isChecked) {
-          totalPrice += val.num * val.price; //累计总价
-          totalLvd += val.num * val.lvd; //累计lvd
+    // chooseChange(item.id, item)
+    chooseChange(id, item) {
+      var shop = JSON.parse(localStorage.getItem('shop'));
+      this.selectedData = [];
+
+      // 循环所有单选框，如果选中就把id添加到selectedData
+      this.$refs.check.forEach((item1) => {
+        if (item1['checked'] === true) {
+          this.selectedData.push(id);
         }
       });
-      this.totalprice = totalPrice;
-      this.totallvd = totalLvd;
+
+      // 更新localStorage的选中状态 变更当前点击的商品状态
+      if (item.isChecked) {
+        shop.forEach((item1, index) => {
+          if (item1.id === item.id) {
+            shop[index].isChecked = true;
+          }
+        });
+      } else {
+        shop.forEach((item1, index) => {
+          if (item1.id === item.id) {
+            shop[index].isChecked = false;
+          }
+        });
+      }
+      localStorage.setItem('shop', JSON.stringify(shop));
+
+      var num = this.selectedData.length;
+      if (num === this.goods.length && item.isChecked === true) {
+        this.allchecked = true;
+      } else if (num === this.goods.length && item.isChecked === false) {
+        this.allchecked = false;
+        item.isChecked = false;
+      } else {
+        this.allchecked = false;
+      }
+      this.count();
+    },
+    // 商品数量
+    // 增加
+    onChangePlus(item) {
+      var shop = JSON.parse(localStorage.getItem('shop'));
+      shop.forEach((item1, index) => {
+        if (item1.id === item.id) {
+          shop[index].num++;
+          Toast(shop[index].num);
+        }
+      });
+      localStorage.setItem('shop', JSON.stringify(shop));
+      // localStorage.this.count();
+      this.count();
+    },
+    // 减少
+    onChangeMinus(item) {
+      var shop = JSON.parse(localStorage.getItem('shop'));
+      shop.forEach((item1, index) => {
+        if (item1.id === item.id) {
+          shop[index].num--;
+          Toast(shop[index].num);
+        }
+      });
+      localStorage.setItem('shop', JSON.stringify(shop));
+      // localStorage.this.count();
+      this.count();
+    },
+
+    // 计算价格
+    count: function() {
+      var shop = JSON.parse(localStorage.getItem('shop'));
+      var totalPrice1 = 0; //临时总价
+      // var totalLvd = 0; //临时lvd
+      shop.forEach(function(val) {
+        if (val.isChecked) {
+          totalPrice1 += val.num * val.shop.price; //累计总价
+          // totalLvd += val.num * val.lvd; //累计lvd
+        }
+      });
+      this.totalprice = totalPrice1;
+      // this.totallvd = totalLvd;
     },
     // 全选
     checkAll() {
-      let list = this.goods;
+      var shop = JSON.parse(localStorage.getItem('shop'));
       if (this.allchecked === true) {
-        list.forEach((element) => {
-          element.isChecked = false;
+        // 如果全选 走这一步 将所有checked变为true
+        this.$refs.check.forEach((item1) => {
+          item1['checked'] = true;
         });
-        this.selectedData = [];
+        shop.forEach((item, index) => {
+          shop[index].isChecked = true;
+        });
+        localStorage.setItem('shop', JSON.stringify(shop));
+
         this.count();
-        console.log('111' + this.selectedData);
       } else {
-        list.forEach((element) => {
-          element.isChecked = true;
-          if (this.selectedData.indexOf(element.id) < 0) {
-            this.selectedData.push(element.id);
-          }
+        // 如果取消全选 走这一步 将所有checked变为false
+        this.$refs.check.forEach((item1) => {
+          item1['checked'] = false;
         });
-        this.count();
-        console.log('222' + this.selectedData);
+        shop.forEach((item, index) => {
+          shop[index].isChecked = true;
+        });
+        localStorage.setItem('shop', JSON.stringify(shop));
+        this.totalprice = 0;
       }
     },
     // 去结算
@@ -192,7 +241,10 @@ export default {
       } else {
         this.$router.push('shopBuy');
       }
-      console.log(cartgoods);
+    },
+    // 回到首页
+    gotohome() {
+      this.$router.push('/homepage/main');
     },
   },
 };
@@ -304,7 +356,7 @@ export default {
                     font-size: 16px;
                     color: #333333;
                     background-color: #fff;
-                    padding: 0px 12px;
+                    padding: 0px;
                   }
                 }
               }
@@ -329,6 +381,18 @@ export default {
       .p1 {
         margin-top: 20px;
       }
+      .gotohome {
+        margin-top: 10px;
+        display: inline-block;
+        border: 1px solid rgba(0, 0, 0, 0.15);
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+        height: 2rem;
+        line-height: 0.5rem;
+        padding: 0 0.24rem;
+        color: rgba(0, 0, 0, 0.87);
+        font-style: normal;
+      }
     }
   }
   .cartfotter {
@@ -339,11 +403,11 @@ export default {
     left: 0;
     .van-submit-bar__bar {
       width: 100%;
-
       height: 60px;
       font-size: 16px;
       position: absolute;
       bottom: 50px;
+      background: #fff;
       .van-checkbox {
         margin-left: 17px;
         ::v-deep .van-checkbox__icon {
@@ -369,11 +433,11 @@ export default {
         display: flex;
         flex-direction: column;
         .p1 {
-          font-size: 10px;
+          font-size: 16px;
           color: #001410;
         }
         .p2 {
-          font-size: 12px;
+          font-size: 16px;
           color: #15c481;
           margin-top: 4px;
         }

@@ -38,8 +38,14 @@ const routes = [
   },
   {
     path: '/classify',
-    name: 'classify',
-    component: () => import('../views/classify/index.vue')
+    name: 'classify/list',
+    component: () => import('../views/classify/index.vue'),
+    children: [
+      {
+        path: 'list',
+        component: () => import('../views/classify/list/index.vue')
+      },
+    ]
   },
   {
     path: '/find',
@@ -67,6 +73,10 @@ const routes = [
       {
         path: 'info',
         component: () => import('../views/my/info/index.vue')
+      },
+      {
+        path: 'edit',
+        component: () => import('../views/my/edit/index.vue')
       }
     ]
   }
